@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <iomanip>
 #include <ctime>
+#include <optional>
 #include "../inc/config.hpp"
 #include "../inc/timer.hpp"
 
@@ -16,6 +17,8 @@ class TimerLogger {
     
     std::string get_file_path(const std::string& name);
     void write_header(const std::string& path);
+    // Get last start/reset time from log file
+    std::optional<std::chrono::system_clock::time_point> get_last_start_time(const std::string& filename);
     
 public:
     TimerLogger() : log_dir(LogPath) {
