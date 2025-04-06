@@ -2,6 +2,8 @@
 #define K_CHRONOLOG
 
 #include "config.hpp"
+#include "timer.hpp"
+#include "logger.hpp"
 #include <getopt.h>
 
 #endif

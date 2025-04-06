@@ -32,6 +32,8 @@ target_compile_features(chronolog PUBLIC cxx_std_20)
 target_sources(chronolog
     PRIVATE src/chronolog.cpp
     PRIVATE src/config.cpp
+    PRIVATE src/logger.cpp
+    PRIVATE src/timer.cpp
 )
 
 # Copyright (c) 2024, Maxamilian Kidd-May

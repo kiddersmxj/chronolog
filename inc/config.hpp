@@ -10,7 +10,11 @@ inline std::string ExampleString;
 inline bool ExampleBool;
 inline int ExampleInt;
 
-const std::string ConfigFilePath = "config.conf";
+inline std::string LogPath;
+inline std::string LogFormat;
+inline std::string CSVHeaders;
+
+const std::string ConfigFilePath = "/home/kidders/devel/chronolog/config.conf";
 // Function to initialize global configuration variables
 int InitConfig();
 
