@@ -35,8 +35,8 @@ TimerManager::TimerState TimerManager::reset(const std::string& name) {
 double TimerManager::get_elapsed(std::time_t stored_time) {
     std::time_t current_time = std::time(nullptr);
     double elapsed = std::difftime(current_time, stored_time);
-        std::cout << "Elapsed time between the stored timestamp and current time: "
-                  << elapsed << " seconds." << std::endl;
+        // std::cout << "Elapsed time between the stored timestamp and current time: "
+        //           << elapsed << " seconds." << std::endl;
     return elapsed;
 }
 

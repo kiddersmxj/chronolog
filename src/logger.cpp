@@ -11,7 +11,6 @@ std::string TimerLogger::get_file_path(const std::string& name, bool increment) 
     current_number = (increment == true) ? current_number + 1 : current_number;
 
     std::string filenumber = "/" + std::to_string(current_number);
-    std::cout << filenumber << std::endl;
     if(pos != std::string::npos) {
         filename.replace(pos, 6, name + filenumber);
     }
@@ -45,7 +44,6 @@ void TimerLogger::write_header(const std::string& path) {
 void TimerLogger::log_event(TimerManager::TimerState timer) {
     std::string filename = get_file_path(timer.name);
     write_header(filename);
-    std::cout << filename << std::endl;
 
     // Obtain the current system time.
     auto now = std::chrono::system_clock::now();
@@ -72,7 +70,7 @@ void TimerLogger::log_event(TimerManager::TimerState timer) {
              << "\"" << timer.total_elapsed << "\","
              << "\"" << timer.name << "\"\n";
         file.close();
-        std::cout << "Event written to CSV file: " << filename << std::endl;
+        // std::cout << "Event written to CSV file: " << filename << std::endl;
     } else {
         std::cerr << "Error: Cannot open file for writing: " << filename << std::endl;
     }

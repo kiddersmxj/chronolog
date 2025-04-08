@@ -10,6 +10,7 @@ int main(int argc, char** argv) {
     int StartFlag = 0;
     int StopFlag = 0;
     int ResetFlag = 0;
+    int PlainFlag = 0;
     std::string Name = "";
 
     // Get opt option defenitions
@@ -21,12 +22,13 @@ int main(int argc, char** argv) {
         { "start", no_argument, NULL, 's' },
         { "stop", no_argument, NULL, 'e' },
         { "reset", no_argument, NULL, 'r' },
+        { "plain", no_argument, NULL, 'p' },
         { 0 }
     };
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hvcsen:r", Opts, 0);
+        opt = getopt_long(argc, argv, "hvcsen:rp", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
@@ -55,6 +57,9 @@ int main(int argc, char** argv) {
             break;
         case 'r':
             ResetFlag = 1;
+            break;
+        case 'p':
+            PlainFlag = 1;
             break;
         case '?':
             Usage();
@@ -89,6 +94,20 @@ int main(int argc, char** argv) {
         }
         else if(ResetFlag) {
             logger.log_reset(timer.reset(Name));
+
+        // Handle no timer operations to just print
+        } else {
+            double elapsed = 0.0;
+            if(last_event_type == "START") {
+                elapsed = timer.stop(Name, last_start, last_elapsed).total_elapsed;
+            } else {
+                elapsed = last_elapsed;
+            }
+            if(PlainFlag) {
+                std::cout << elapsed << std::endl;
+            } else {
+                std::cout << "Total elapsed time for " << Name << ": " << elapsed << std::endl;
+            }
         }
         
         return 0;
