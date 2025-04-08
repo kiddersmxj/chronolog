@@ -14,7 +14,7 @@ inline std::string LogPath;
 inline std::string LogFormat;
 inline std::string CSVHeaders;
 
-const std::string ConfigFilePath = "/home/kidders/devel/chronolog/config.conf";
+const std::string ConfigFilePath = "/home/kidders/.chronolog/chronolog.conf";
 // Function to initialize global configuration variables
 int InitConfig();
 

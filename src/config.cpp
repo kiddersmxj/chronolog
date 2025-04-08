@@ -2,7 +2,7 @@
 
 int InitConfig() {
     // Load configuration file using the singleton Config instance
-    if (!k::config::Config::getInstance().load(ConfigFilePath)) {
+    if(!k::config::Config::getInstance().load(ConfigFilePath)) {
         std::cerr << "Failed to load config file: " << ConfigFilePath << std::endl;
         // Handle error as needed
         return 1;
