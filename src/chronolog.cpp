@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
             logger.log_event(timer.start(Name, last_elapsed));
         }
         else if(StopFlag) {
-            if(last_event_type == "STOP") {
+            if(last_event_type != "START") {
                 std::cout << "Error: Timer not started or does not exist\n";
                 return 1;
             }
