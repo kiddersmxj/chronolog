@@ -5,6 +5,11 @@
 #include "timer.hpp"
 #include "logger.hpp"
 #include <getopt.h>
+#include <string>
+#include <iomanip>
+
+std::string format_duration(double total_seconds);
+double parse_duration(const std::string& duration_str);
 
 #endif
 

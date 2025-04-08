@@ -19,7 +19,7 @@ class TimerManager {
         TimerManager::TimerState start(const std::string& name, double last_elapsed);
         TimerManager::TimerState stop(const std::string& name, std::time_t last_start, double last_elapsed);
         TimerManager::TimerState reset(const std::string& name);
-        TimerManager::TimerState add(const std::string& name, double last_elapsed, std::string elapsed_addition);
+        TimerManager::TimerState add(const std::string& name, double last_elapsed, double elapsed_addition);
 
     private:
         std::tm get_time();
