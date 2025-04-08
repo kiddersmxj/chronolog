@@ -28,8 +28,8 @@ options:
     -h / --help         show help and usage notes
     -v / --version      print version and exit
     -n / --name         assign name, will create new log if new name and print elapsed time if no timer operation passed
-    -t / --start        starts the named timer
-    -o / --stop         stops the named timer
+         --start        starts the named timer
+         --stop         stops the named timer
     -r / --reset        resets the timer but keeps old logs
     -a / --add          add time to the timer (input type chages with -s flag)
     -p / --plain        print only output to terminal (for command use)
