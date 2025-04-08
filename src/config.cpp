@@ -8,10 +8,6 @@ int InitConfig() {
         return 1;
     }
 
-//     KCONFIG_ARRAY_REQUIRED(ExampleArray, "example.array")
-//     KCONFIG_VAR_REQUIRED(ExampleBool, "example.bool")
-//     KCONFIG_VAR(ExampleInt, "example.int", 10)
-
     KCONFIG_VAR_REQUIRED(LogPath, "log.path")
     KCONFIG_VAR_REQUIRED(LogFormat, "log.file_format")
     KCONFIG_VAR_REQUIRED(CSVHeaders, "log.csv_headers")
