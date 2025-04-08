@@ -68,18 +68,19 @@ int main(int argc, char** argv) {
     if(!Name.empty()) {
         TimerManager timer;
         TimerLogger logger;
+
+        auto last_start = logger.get_last_start_time(Name);
+        auto last_elapsed = logger.read_prev_elapsed(Name);
         
         if(StartFlag) {
-            timer.start(Name);
-            logger.log_event(Name, "START");
+            logger.log_event(timer.start(Name, last_elapsed));
         }
         else if(StopFlag) {
-            timer.stop(Name);
-            logger.log_event(Name, "STOP");
+            logger.log_event(timer.stop(Name, last_start, last_elapsed));
         }
         else if(ResetFlag) {
-            timer.reset(Name);
-            logger.log_event(Name, "RESET");
+            logger.log_reset(timer.reset(Name));
+            // logger.log_event(Name, "RESET");
         }
         
         return 0;

@@ -1,33 +1,69 @@
 #include "../inc/timer.hpp"
 
-void TimerManager::start(const std::string& name) {
-    auto& timer = timers[name];
-    if (!timer.is_running) {
-        timer.start_time = std::chrono::steady_clock::now();
-        timer.is_running = true;
-    }
+TimerManager::TimerState TimerManager::start(const std::string& name, double last_elapsed) {
+    TimerState timer;
+    timer.name = name;
+    timer.start_time = std::chrono::system_clock::now();
+    timer.event_type = "START";
+    timer.total_elapsed = last_elapsed;
+    return timer;
 }
 
-void TimerManager::stop(const std::string& name) {
-    auto it = timers.find(name);
-    if (it != timers.end() && it->second.is_running) {
-        auto& timer = it->second;
-        auto end = std::chrono::steady_clock::now();
-        timer.total_elapsed += std::chrono::duration<double>(end - timer.start_time).count();
-        timer.is_running = false;
-    }
+TimerManager::TimerState TimerManager::stop(const std::string& name, std::time_t last_start, double last_elapsed) {
+    double elapsed = get_elapsed(last_start);
+
+    TimerState timer;
+    timer.name = name;
+    timer.event_type = "STOP";
+    timer.total_elapsed = elapsed + last_elapsed;
+
+    return timer;
 }
 
-void TimerManager::reset(const std::string& name) {
-    timers.erase(name);
+TimerManager::TimerState TimerManager::reset(const std::string& name) {
+    TimerState timer;
+
+    timer.name = name;
+    timer.event_type = "RESET";
+    timer.total_elapsed = 0.0;
+    timer.start_time = std::chrono::system_clock::now();
+
+    return timer;
 }
 
-double TimerManager::get_elapsed(const std::string& name) const {
-    auto it = timers.find(name);
-    if (it != timers.end()) {
-        return it->second.total_elapsed;
-    }
-    return 0.0;
+// double TimerManager::get_elapsed(const std::chrono::system_clock::time_point& last_start) const {
+//     std::cout << last_start << std::endl;
+//     // Get duration since last start using system_clock
+//     auto now = std::chrono::system_clock::now();
+//     auto elapsed = now - last_start;
+//     std::cout << elapsed << std::endl;
+//     return std::chrono::duration<double>(elapsed).count();
+// }
+
+// double TimerManager::get_elapsed(const std::chrono::system_clock::time_point& last_start) const {
+//     // Convert last_start to time_t for a human-readable format.
+//     std::time_t start_time = std::chrono::system_clock::to_time_t(last_start);
+//     std::cout << "Start time: " 
+//               << std::put_time(std::localtime(&start_time), "%F %T") << std::endl;
+    
+//     // Get current time and compute the elapsed duration.
+//     auto now = std::chrono::system_clock::now();
+//     auto elapsed = now - last_start;
+    
+//     // Convert the elapsed duration to seconds (as a double).
+//     double seconds_elapsed = std::chrono::duration<double>(elapsed).count();
+//     std::cout << "Elapsed time: " << seconds_elapsed << " seconds" << std::endl;
+    
+//     return seconds_elapsed;
+// }
+
+// Function that calculates the elapsed time, in seconds, between the provided stored time and the current time.
+double TimerManager::get_elapsed(std::time_t stored_time) {
+    std::time_t current_time = std::time(nullptr);
+    double elapsed = std::difftime(current_time, stored_time);
+        std::cout << "Elapsed time between the stored timestamp and current time: "
+                  << elapsed << " seconds." << std::endl;
+    return elapsed;
 }
 
 // Copyright (c) 2024, Maxamilian Kidd-May
