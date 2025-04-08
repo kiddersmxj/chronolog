@@ -31,32 +31,6 @@ TimerManager::TimerState TimerManager::reset(const std::string& name) {
     return timer;
 }
 
-// double TimerManager::get_elapsed(const std::chrono::system_clock::time_point& last_start) const {
-//     std::cout << last_start << std::endl;
-//     // Get duration since last start using system_clock
-//     auto now = std::chrono::system_clock::now();
-//     auto elapsed = now - last_start;
-//     std::cout << elapsed << std::endl;
-//     return std::chrono::duration<double>(elapsed).count();
-// }
-
-// double TimerManager::get_elapsed(const std::chrono::system_clock::time_point& last_start) const {
-//     // Convert last_start to time_t for a human-readable format.
-//     std::time_t start_time = std::chrono::system_clock::to_time_t(last_start);
-//     std::cout << "Start time: " 
-//               << std::put_time(std::localtime(&start_time), "%F %T") << std::endl;
-    
-//     // Get current time and compute the elapsed duration.
-//     auto now = std::chrono::system_clock::now();
-//     auto elapsed = now - last_start;
-    
-//     // Convert the elapsed duration to seconds (as a double).
-//     double seconds_elapsed = std::chrono::duration<double>(elapsed).count();
-//     std::cout << "Elapsed time: " << seconds_elapsed << " seconds" << std::endl;
-    
-//     return seconds_elapsed;
-// }
-
 // Function that calculates the elapsed time, in seconds, between the provided stored time and the current time.
 double TimerManager::get_elapsed(std::time_t stored_time) {
     std::time_t current_time = std::time(nullptr);
