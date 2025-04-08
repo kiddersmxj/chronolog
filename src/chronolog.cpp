@@ -52,7 +52,6 @@ int main(int argc, char** argv) {
     int opt;
     int HelpFlag = 0;
     int VersionFlag = 0;
-    int CreateFlag = 0;
     int StartFlag = 0;
     int StopFlag = 0;
     int ResetFlag = 0;
@@ -65,7 +64,6 @@ int main(int argc, char** argv) {
     struct option Opts[] = {
         { "help", no_argument, &HelpFlag, 1 },
         { "version", no_argument, &VersionFlag, 1 },
-        { "create", no_argument, &CreateFlag, 'c' },
         { "name", required_argument, NULL, 'n' },
         { "start", no_argument, NULL, 't' },
         { "stop", no_argument, NULL, 'o' },
