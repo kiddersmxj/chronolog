@@ -124,6 +124,12 @@ int main(int argc, char** argv) {
         }
     }
 
+    if((StartFlag + StopFlag + ResetFlag + !Add.empty()) > 1) {
+        std::cout << "Error: cannot use more then one of flags --start, --stop, --reset, or --add at the same time\n\n";
+        Usage();
+        return 1;
+    }
+
     if(!Name.empty()) {
         TimerManager timer;
         TimerLogger logger;
