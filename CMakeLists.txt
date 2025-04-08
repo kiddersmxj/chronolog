@@ -38,6 +38,14 @@ target_sources(chronolog
 
 # --- Install chronolog.conf and copy to $HOME/.chronolog/chronolog.conf if it doesn't exist ----------------
 
+# Define configurable variables (they can be set or overridden before invoking install)
+set(CHRONOLOG_CONF_INSTALL_DIR ".chronolog" 
+    CACHE STRING "Directory (relative to the user home) where the chronolog configuration file will be installed")
+set(CHRONOLOG_CONF_FILE_NAME "chronolog.conf" 
+    CACHE STRING "The desired chronolog configuration file name")
+set(CHRONOLOG_SOURCE_FILE "${CMAKE_SOURCE_DIR}/chronolog.conf" 
+    CACHE FILEPATH "Path to the source chronolog configuration file")
+
 install(CODE "
     # Determine the original user
     if(DEFINED ENV{SUDO_USER} AND NOT \"\$ENV{SUDO_USER}\" STREQUAL \"root\")
@@ -57,12 +65,30 @@ install(CODE "
         message(FATAL_ERROR \"Failed to determine home directory for user '\${ORIGINAL_USER}'\")
     endif()
 
-    set(CONFIG_FILE \"\${USER_HOME}/.chronolog/chronolog.conf\")
+    # Inject the user-defined values into the install script.
+    set(CONFIG_INSTALL_DIR \"${CHRONOLOG_CONF_INSTALL_DIR}\")
+    set(CONFIG_FILE_NAME \"${CHRONOLOG_CONF_FILE_NAME}\")
+    set(SOURCE_FILE \"${CHRONOLOG_SOURCE_FILE}\")
+
+    # Construct the destination directory and file path.
+    set(CONFIG_DIR \"\${USER_HOME}/\${CONFIG_INSTALL_DIR}\")
+    set(CONFIG_FILE \"\${CONFIG_DIR}/\${CONFIG_FILE_NAME}\")
+
+    # Ensure that the destination directory is created (including any intermediate directories)
+    file(MAKE_DIRECTORY \"\${CONFIG_DIR}\")
 
     if(NOT EXISTS \"\${CONFIG_FILE}\")
         message(\"Installing configuration file to \${CONFIG_FILE}\")
-        file(COPY \"${CMAKE_SOURCE_DIR}/chronolog.conf\" DESTINATION \"\${USER_HOME}\" FILE_PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
-        file(RENAME \"\${USER_HOME}/chronolog.conf\" \"\${CONFIG_FILE}\")
+
+        # Copy the source file to the destination directory with the desired file permissions.
+        file(COPY \"\${SOURCE_FILE}\" DESTINATION \"\${CONFIG_DIR}\" 
+             FILE_PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+
+        # If the source file name differs from the desired target name, then rename it accordingly.
+        get_filename_component(SOURCE_BASENAME \"\${SOURCE_FILE}\" NAME)
+        if(NOT \"\${SOURCE_BASENAME}\" STREQUAL \"\${CONFIG_FILE_NAME}\")
+            file(RENAME \"\${CONFIG_DIR}/\${SOURCE_BASENAME}\" \"\${CONFIG_FILE}\")
+        endif()
     else()
         message(\"Configuration file already exists at \${CONFIG_FILE}\")
     endif()
