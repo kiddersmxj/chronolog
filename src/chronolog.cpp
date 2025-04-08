@@ -71,16 +71,24 @@ int main(int argc, char** argv) {
 
         auto last_start = logger.get_last_start_time(Name);
         auto last_elapsed = logger.read_prev_elapsed(Name);
+        auto last_event_type = logger.get_last_event_type(Name);
         
         if(StartFlag) {
+            if(last_event_type == "START") {
+                std::cout << "Error: Timer already started\n";
+                return 1;
+            }
             logger.log_event(timer.start(Name, last_elapsed));
         }
         else if(StopFlag) {
+            if(last_event_type == "STOP") {
+                std::cout << "Error: Timer not started or does not exist\n";
+                return 1;
+            }
             logger.log_event(timer.stop(Name, last_start, last_elapsed));
         }
         else if(ResetFlag) {
             logger.log_reset(timer.reset(Name));
-            // logger.log_event(Name, "RESET");
         }
         
         return 0;

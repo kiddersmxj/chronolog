@@ -33,12 +33,9 @@ class TimerLogger {
         int get_current_log(const std::string &directory_path);
         void log_reset(TimerManager::TimerState timer);
         double read_prev_elapsed(const std::string &name);
+        std::string get_last_event_type(const std::string &name);
         void log_event(TimerManager::TimerState timer);
-        // Get last start/reset time from log file
         std::time_t get_last_start_time(const std::string& name);
-        // std::optional<std::chrono::system_clock::time_point> get_last_start_time(const std::string& filename);
-        // std::chrono::system_clock::time_point getLastTimestamp(const std::string& name);
-        // std::optional<double> get_elapsed_since_last_start(const std::string& name);
 };
 
 #endif

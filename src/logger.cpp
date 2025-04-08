@@ -29,6 +29,8 @@ std::string TimerLogger::get_dir_path(const std::string& name) {
 
 void TimerLogger::write_header(const std::string& path) {
     if(!headers_written && !std::filesystem::exists(path)) {
+        // Create parent directories if they don't exist
+        std::filesystem::create_directories(fs::path(path).parent_path());
         std::ofstream file(path);
         if(file.is_open()) {
             file << CSVHeaders << "\n";
@@ -37,30 +39,12 @@ void TimerLogger::write_header(const std::string& path) {
     }
 }
 
-// void TimerLogger::log_event(TimerManager::TimerState timer, const std::string& event_type) {
-//     std::string path = get_file_path(timer.name);
-//     write_header(path);
-
-//     // Get the current time from the system clock.
-//     // Convert the time_point to a time_t (seconds since epoch).
-//     std::time_t now_time = std::chrono::system_clock::to_time_t(timer.start_time);
-//     // Convert the time_t to a tm structure representing local time.
-//     std::tm local_tm = *std::localtime(&now_time);
-    
-//     std::ofstream file(path, std::ios::app);
-//     if(file.is_open()) {
-//         file << "\"" << event_type << "\","
-//              << "\"" << std::put_time(&local_tm, "%Y-%m-%d %H:%M:%S") << "\","
-//              << "\"" << ((event_type == "STOP") ? timer.total_elapsed : 0.0) << "\","
-//              << "\"" << timer.name << "\"\n";
-//     }
-// }
-
 // Function that appends a new event row to a CSV file.
 // The CSV row format is: event_type,timestamp,elapsed_seconds,name
 // For this example, event_type is "START", elapsed_seconds is 0.0, and name is "t8".
 void TimerLogger::log_event(TimerManager::TimerState timer) {
     std::string filename = get_file_path(timer.name);
+    write_header(filename);
     std::cout << filename << std::endl;
 
     // Obtain the current system time.
@@ -102,6 +86,12 @@ void TimerLogger::log_event(TimerManager::TimerState timer) {
 // Return Value: The highest number extracted from a filename matching the "number.csv" pattern.
 int TimerLogger::get_current_log(const std::string &directory_path) {
     int max_log = 0;
+    // Create directory if it doesn't exist
+    if (!fs::exists(directory_path)) {
+        fs::create_directories(directory_path);
+        return 0; // No existing logs in new directory
+    }
+    
     // Regular expression to match a filename that starts with one or more digits and ends with ".csv".
     std::regex pattern(R"((\d+)\.csv$)");
     
@@ -134,70 +124,6 @@ void TimerLogger::log_reset(TimerManager::TimerState timer) {
     std::string newpath = get_file_path(timer.name, true);
     write_header(newpath);
 }
-
-// std::optional<double> TimerLogger::get_elapsed_since_last_start(const std::string& name) {
-//     std::string path = get_file_path(name);
-//     std::ifstream file(path);
-//     if (!file.is_open()) {
-//         std::cerr << "Failed to open file: " << path << std::endl;
-//         return std::nullopt;
-//     }
-
-//     std::string line;
-//     std::optional<std::chrono::system_clock::time_point> last_time;
-
-//     // Skip header
-//     if (!std::getline(file, line)) {
-//         std::cerr << "File is empty: " << path << std::endl;
-//         return std::nullopt;
-//     }
-
-//     // Iterate through each line to find the latest START/RESET timestamp.
-//     while (std::getline(file, line)) {
-//         std::istringstream iss(line);
-//         std::string token;
-//         std::vector<std::string> parts;
-//         while (std::getline(iss, token, ',')) {
-//             // Remove quotes if present.
-//             if (!token.empty() && token.front() == '"') token.erase(0, 1);
-//             if (!token.empty() && token.back() == '"') token.pop_back();
-//             parts.push_back(token);
-//         }
-
-//         if (parts.size() >= 2 && (parts[0] == "START" || parts[0] == "RESET")) {
-//             std::tm tm = {};
-//             std::istringstream ss(parts[1]);
-//             ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-//             if (!ss.fail()) {
-//                 // Use timegm to convert the tm (assumed UTC) into time_t.
-//                 std::time_t file_time = timegm(&tm); // POSIX-specific
-//                 auto time_point = std::chrono::system_clock::from_time_t(file_time);
-//                 if (!last_time || time_point > *last_time) {
-//                     last_time = time_point;
-//                 }
-//             }
-//         }
-//     }
-
-//     if (!last_time) {
-//         std::cout << "Last time: not set." << std::endl;
-//         return std::nullopt;
-//     }
-
-//     // Convert to time_t and then to a tm structure in UTC using std::gmtime.
-//     std::time_t time = std::chrono::system_clock::to_time_t(*last_time);
-//     std::tm* tm_ptr = std::gmtime(&time);
-//     std::cout << "Last time: " << std::put_time(tm_ptr, "%Y-%m-%d %H:%M:%S") << std::endl;
-
-//     // Calculate the elapsed time from the last timestamp to now.
-//     auto now = std::chrono::system_clock::now();
-//     auto elapsed = now - *last_time;
-//     double seconds_elapsed = std::chrono::duration<double>(elapsed).count();
-//     std::cout << "Elapsed time (seconds): " << seconds_elapsed << std::endl;
-
-//     return seconds_elapsed;
-// }
-
 // Utility function to remove surrounding quotes from a string.
 std::string TimerLogger::trimQuotes(const std::string &str) {
     if (str.size() >= 2 && str.front() == '\"' && str.back() == '\"') {
@@ -363,123 +289,57 @@ double TimerLogger::read_prev_elapsed(const std::string &name) {
     return elapsedValue;
 }
 
-// std::optional<std::chrono::system_clock::time_point> TimerLogger::get_last_start_time(const std::string& name) {
-//     std::string path = get_file_path(name);
-//     std::ifstream file(path);
-//     if (!file.is_open()) {
-//         return std::nullopt;
-//     }
+std::string TimerLogger::get_last_event_type(const std::string &name) {
+    std::string filename = get_file_path(name);
 
-//     std::string line;
-//     std::optional<std::chrono::system_clock::time_point> last_time;
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: Cannot open CSV file: " << filename << std::endl;
+        return "";
+    }
     
-//     // Skip header
-//     std::getline(file, line);
+    std::string line;
+    std::string lastLine;
+    bool headerSkipped = false;
 
-//     while (std::getline(file, line)) {
-//         std::istringstream iss(line);
-//         std::string token;
-//         std::vector<std::string> parts;
+    // Iterate through the file lines. If a header is present, skip it.
+    while (std::getline(file, line)) {
+        if (line.empty())
+            continue;
         
-//         while (std::getline(iss, token, ',')) {
-//             // Remove quotes and trim whitespace
-//             if (!token.empty() && token.front() == '"') token.erase(0, 1);
-//             if (!token.empty() && token.back() == '"') token.pop_back();
-//             parts.push_back(token);
-//         }
-
-//         if (parts.size() >= 2 && (parts[0] == "START" || parts[0] == "RESET")) {
-//             std::tm tm = {};
-//             std::istringstream ss(parts[1]);
-//             ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-            
-//             if (!ss.fail()) {
-//                 auto time_point = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-//                 if (!last_time || time_point > *last_time) {
-//                     last_time = time_point;
-//                 }
-//             }
-//         }
-//     }
-
-//         if (last_time) {
-//         // Convert time_point to time_t
-//         std::time_t time = std::chrono::system_clock::to_time_t(*last_time);
-
-//         // Convert to local time (or use std::gmtime for UTC)
-//         std::tm* tm_ptr = std::localtime(&time);
-
-//         // Output in a human-readable format
-//         std::cout << "Last time: " << std::put_time(tm_ptr, "%Y-%m-%d %H:%M:%S") << std::endl;
-//     } else {
-//         std::cout << "Last time: not set." << std::endl;
-//     }
-
-//     return last_time;
-// }
-
-// Function that reads the last non-empty line from a CSV file,
-// extracts the timestamp from the second column, and returns it as a time_point.
-// std::chrono::system_clock::time_point TimerLogger::getLastTimestamp(const std::string& name) {
-//     std::ifstream file(get_file_path(name));
-//     if (!file.is_open()) {
-//         throw std::runtime_error("Could not open file: " + name);
-//     }
+        // Check if the header line is present (contains "event_type").
+        if (!headerSkipped) {
+            if (line.find("event_type") != std::string::npos) {
+                headerSkipped = true;
+                continue;
+            }
+            headerSkipped = true; // Assume first line is data if no header.
+        }
+        lastLine = line;
+    }
     
-//     std::string line, lastLine;
-//     // Read the entire file to capture the last non-empty line.
-//     while (std::getline(file, line)) {
-//         if (!line.empty()) {
-//             lastLine = line;
-//         }
-//     }
-//     file.close();
+    file.close();
     
-//     if (lastLine.empty()) {
-//         throw std::runtime_error("File is empty or contains no valid lines.");
-//     }
+    if (lastLine.empty()) {
+        std::cerr << "Error: No data found in CSV file." << std::endl;
+        return "";
+    }
     
-//     std::istringstream ss(lastLine);
-//     std::string token;
+    // Tokenize the last line by comma to extract the columns.
+    std::stringstream ss(lastLine);
+    std::string token;
+    std::string eventType;
+    if (std::getline(ss, token, ',')) {
+        eventType = trimQuotes(token);
+    }
     
-//     // Skip the first column ("event_type").
-//     if (!std::getline(ss, token, ',')) {
-//         throw std::runtime_error("CSV parsing error: missing first column.");
-//     }
+    if (eventType.empty()) {
+        std::cerr << "Error: Could not find the event_type column in the last row." << std::endl;
+        return "";
+    }
     
-//     // Retrieve the second column (timestamp).
-//     if (!std::getline(ss, token, ',')) {
-//         throw std::runtime_error("CSV parsing error: missing timestamp column.");
-//     }
-    
-//     // Remove potential leading and trailing quotes.
-//     if (!token.empty() && token.front() == '"') {
-//         token.erase(0, 1);
-//     }
-//     if (!token.empty() && token.back() == '"') {
-//         token.pop_back();
-//     }
-    
-//     // The expected format is "YYYY-MM-DDTHH:MM:SS" (ISO 8601).
-//     std::tm tm = {};
-//     std::istringstream timeStream(token);
-//     timeStream >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-//     if (timeStream.fail()) {
-//         throw std::runtime_error("Failed to parse time: " + token);
-//     }
-    
-//     // Convert the parsed std::tm structure into time_t.
-//     // Note: std::mktime assumes local time.
-//     std::time_t time_c = std::mktime(&tm);
-//     if (time_c == -1) {
-//         throw std::runtime_error("Error converting std::tm to time_t.");
-//     }
-
-//     std::cout << std::chrono::system_clock::from_time_t(time_c) << std::endl;
-    
-//     // Convert time_t to std::chrono::system_clock::time_point.
-//     return std::chrono::system_clock::from_time_t(time_c);
-// }
+    return eventType;
+}
 
 // Copyright (c) 2024, Maxamilian Kidd-May
 // All rights reserved.
