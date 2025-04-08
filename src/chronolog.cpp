@@ -57,6 +57,7 @@ int main(int argc, char** argv) {
     int ResetFlag = 0;
     int PlainFlag = 0;
     int SecondsFlag = 0;
+    int OnFlag = 0;
     std::string Name = "";
     std::string Add = "";
 
@@ -65,18 +66,19 @@ int main(int argc, char** argv) {
         { "help", no_argument, &HelpFlag, 1 },
         { "version", no_argument, &VersionFlag, 1 },
         { "name", required_argument, NULL, 'n' },
-        { "start", no_argument, NULL, 't' },
-        { "stop", no_argument, NULL, 'o' },
+        { "start", no_argument, NULL, 'y' },
+        { "stop", no_argument, NULL, 'z' },
         { "reset", no_argument, NULL, 'r' },
         { "add", required_argument, NULL, 'a' },
         { "plain", no_argument, NULL, 'p' },
         { "seconds", no_argument, NULL, 's' },
+        { "on", no_argument, NULL, 'o' },
         { 0 }
     };
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hvcsoan:rpt", Opts, 0);
+        opt = getopt_long(argc, argv, "hvsa:n:rpoyz", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
@@ -97,11 +99,8 @@ int main(int argc, char** argv) {
         case 'n':
             Name = optarg;
             break;
-        case 't':
-            StartFlag = 1;
-            break;
         case 'o':
-            StopFlag = 1;
+            OnFlag = 1;
             break;
         case 'r':
             ResetFlag = 1;
@@ -114,6 +113,12 @@ int main(int argc, char** argv) {
             break;
         case 's':
             SecondsFlag = 1;
+            break;
+        case 'y':
+            StartFlag = 1;
+            break;
+        case 'z':
+            StopFlag = 1;
             break;
         case '?':
             Usage();
@@ -145,7 +150,23 @@ int main(int argc, char** argv) {
             last_event_type = logger.get_last_event_type(Name);
         }
         
-        if(StartFlag) {
+        if(OnFlag) {
+            bool on = false;
+            if(last_event_type == "START") {
+                on = true;
+            }
+            if(PlainFlag) {
+                std::cout << on << std::endl;
+            } else {
+                if(on) {
+                    std::cout << "Timer is running" << std::endl;
+                } else {
+                    std::cout << "Timer is not running" << std::endl;
+                }
+            }
+            return 0;
+
+        } else if(StartFlag) {
             if(last_event_type == "START") {
                 std::cout << "Error: Timer already started\n";
                 return 1;
