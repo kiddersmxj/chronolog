@@ -20,10 +20,20 @@ int InitConfig();
 
 const std::string ProgramName = "chronolog";
 const std::string Version = "0.0.0";
-const std::string UsageNotes = R"(usage: chronolog [ -h/-v ]
+const std::string UsageNotes = R"(usage: chronolog [ -h/-v ] [ -n name ] 
+[ --start/--stop/--reset ]/[ --add hh:mm:ss/seconds ]
+[ -p ] [ -s ]
+
 options:
     -h / --help         show help and usage notes
-    -v / --version      print version and exit)";
+    -v / --version      print version and exit
+    -n / --name         assign name, will create new log if new name and print elapsed time if no timer operation passed
+    -t / --start        starts the named timer
+    -o / --stop         stops the named timer
+    -r / --reset        resets the timer but keeps old logs
+    -a / --add          add time to the timer (input type chages with -s flag)
+    -p / --plain        print only output to terminal (for command use)
+    -s / --seconds      use seconds for input/output instead of hh:mm:ss format)";
 
 void Usage();
 void Usage(std::string Message);
