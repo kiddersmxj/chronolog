@@ -19,7 +19,7 @@ const std::string ConfigFilePath = "/home/kidders/devel/chronolog/config.conf";
 int InitConfig();
 
 const std::string ProgramName = "chronolog";
-const std::string Version = "0.0.0";
+const std::string Version = "0.1.0";
 const std::string UsageNotes = R"(usage: chronolog [ -h/-v ] [ -n name ] 
 [ --start/--stop/--reset ]/[ --add hh:mm:ss/seconds ]
 [ -p ] [ -s ]
