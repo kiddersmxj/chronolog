@@ -31,6 +31,28 @@ TimerManager::TimerState TimerManager::reset(const std::string& name) {
     return timer;
 }
 
+TimerManager::TimerState TimerManager::add(const std::string& name, double last_elapsed, std::string elapsed_addition) {
+
+    double elapsed_addition_double = 0.0;
+    try {
+        // Convert the string to a double using std::stod.
+        elapsed_addition_double = std::stod(elapsed_addition);
+    } catch (const std::invalid_argument& e) {
+        std::cerr << "Conversion of add value failed: The provided string '" << elapsed_addition
+                  << "' does not contain a valid number. Error: " << e.what() << std::endl;
+    } catch (const std::out_of_range& e) {
+        std::cerr << "Conversion of add value failed: The number in the string '" << elapsed_addition
+                  << "' is out of the range representable by a double. Error: " << e.what() << std::endl;
+    }
+
+    TimerState timer;
+    timer.name = name;
+    timer.event_type = "STOP";
+    timer.total_elapsed = last_elapsed + elapsed_addition_double;
+
+    return timer;
+}
+
 // Function that calculates the elapsed time, in seconds, between the provided stored time and the current time.
 double TimerManager::get_elapsed(std::time_t stored_time) {
     std::time_t current_time = std::time(nullptr);

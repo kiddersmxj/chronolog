@@ -12,6 +12,7 @@ int main(int argc, char** argv) {
     int ResetFlag = 0;
     int PlainFlag = 0;
     std::string Name = "";
+    std::string Add = "";
 
     // Get opt option defenitions
     struct option Opts[] = {
@@ -20,15 +21,16 @@ int main(int argc, char** argv) {
         { "create", no_argument, &CreateFlag, 'c' },
         { "name", required_argument, NULL, 'n' },
         { "start", no_argument, NULL, 's' },
-        { "stop", no_argument, NULL, 'e' },
+        { "stop", no_argument, NULL, 'o' },
         { "reset", no_argument, NULL, 'r' },
+        { "add", required_argument, NULL, 'a' },
         { "plain", no_argument, NULL, 'p' },
         { 0 }
     };
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hvcsen:rp", Opts, 0);
+        opt = getopt_long(argc, argv, "hvcsoan:rp", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
@@ -52,11 +54,14 @@ int main(int argc, char** argv) {
         case 's':
             StartFlag = 1;
             break;
-        case 'e':
+        case 'o':
             StopFlag = 1;
             break;
         case 'r':
             ResetFlag = 1;
+            break;
+        case 'a':
+            Add = optarg;
             break;
         case 'p':
             PlainFlag = 1;
@@ -95,8 +100,10 @@ int main(int argc, char** argv) {
         else if(ResetFlag) {
             logger.log_reset(timer.reset(Name));
 
-        // Handle no timer operations to just print
+        } else if(!Add.empty()) {
+            logger.log_event(timer.add(Name, last_elapsed, Add));
         } else {
+            // Handle no timer operations to just print
             double elapsed = 0.0;
             if(last_event_type == "START") {
                 elapsed = timer.stop(Name, last_start, last_elapsed).total_elapsed;
