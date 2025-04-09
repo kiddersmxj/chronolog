@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
     int PlainFlag = 0;
     int SecondsFlag = 0;
     int OnFlag = 0;
+    int CreateFlag = 0;
     std::string Name = "";
     std::string Add = "";
 
@@ -73,12 +74,13 @@ int main(int argc, char** argv) {
         { "plain", no_argument, NULL, 'p' },
         { "seconds", no_argument, NULL, 's' },
         { "on", no_argument, NULL, 'o' },
+        { "create", no_argument, NULL, 'c' },
         { 0 }
     };
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hvsa:n:rpoyz", Opts, 0);
+        opt = getopt_long(argc, argv, "hvsa:n:rpoyzc", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
@@ -114,6 +116,9 @@ int main(int argc, char** argv) {
         case 's':
             SecondsFlag = 1;
             break;
+        case 'c':
+            CreateFlag = 1;
+            break;
         case 'y':
             StartFlag = 1;
             break;
@@ -144,11 +149,16 @@ int main(int argc, char** argv) {
         std::string last_event_type = "";
 
         // Check if log file exists before trying to read from it
-        if(std::filesystem::exists(logger.get_file_path(Name))) {
-            last_start = logger.get_last_start_time(Name);
-            last_elapsed = logger.read_prev_elapsed(Name);
-            last_event_type = logger.get_last_event_type(Name);
+        if(!std::filesystem::exists(logger.get_dir_path(Name)) && (!CreateFlag || !StartFlag)) {
+            std::cerr << "Error: Log file does not exist for '" << Name << "'\nTo create one pass -c / --create flag and --start flag to start the timer";
+            return 1;
+        } else {
+            std::cout << CreateFlag << " " << StartFlag << std::endl;
         }
+
+        last_start = logger.get_last_start_time(Name);
+        last_elapsed = logger.read_prev_elapsed(Name);
+        last_event_type = logger.get_last_event_type(Name);
         
         if(OnFlag) {
             bool on = false;
