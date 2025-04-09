@@ -32,6 +32,7 @@ options:
          --stop         stops the named timer
     -r / --reset        resets the timer but keeps old logs
     -a / --add          add time to the timer (input type chages with -s flag)
+    -t / --toggle       toggles timer on/off
     -c / --create       used to create a new log (must be used with a name and --start flag)
     -p / --plain        print only output to terminal (for command use)
     -s / --seconds      use seconds for input/output instead of hh:mm:ss format)";

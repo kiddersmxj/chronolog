@@ -59,6 +59,7 @@ int main(int argc, char** argv) {
     int SecondsFlag = 0;
     int OnFlag = 0;
     int CreateFlag = 0;
+    int ToggleFlag = 0;
     std::string Name = "";
     std::string Add = "";
 
@@ -70,6 +71,7 @@ int main(int argc, char** argv) {
         { "start", no_argument, NULL, 'y' },
         { "stop", no_argument, NULL, 'z' },
         { "reset", no_argument, NULL, 'r' },
+        { "toggle", no_argument, NULL, 't' },
         { "add", required_argument, NULL, 'a' },
         { "plain", no_argument, NULL, 'p' },
         { "seconds", no_argument, NULL, 's' },
@@ -80,7 +82,7 @@ int main(int argc, char** argv) {
 
     // Infinite loop, to be broken when we are done parsing options
     while (1) {
-        opt = getopt_long(argc, argv, "hvsa:n:rpoyzc", Opts, 0);
+        opt = getopt_long(argc, argv, "hvsta:n:rpoyzc", Opts, 0);
 
         // A return value of -1 indicates that there are no more options
         if (opt == -1) {
@@ -103,6 +105,9 @@ int main(int argc, char** argv) {
             break;
         case 'o':
             OnFlag = 1;
+            break;
+        case 't':
+            ToggleFlag = 1;
             break;
         case 'r':
             ResetFlag = 1;
@@ -159,6 +164,14 @@ int main(int argc, char** argv) {
         last_start = logger.get_last_start_time(Name);
         last_elapsed = logger.read_prev_elapsed(Name);
         last_event_type = logger.get_last_event_type(Name);
+
+        if(ToggleFlag) {
+            if(last_event_type == "STOP") {
+                StartFlag = 1;
+            } else {
+                StopFlag = 1;
+            }
+        }
         
         if(OnFlag) {
             bool on = false;
