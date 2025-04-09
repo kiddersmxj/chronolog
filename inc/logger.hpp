@@ -21,7 +21,6 @@ class TimerLogger {
         std::filesystem::path log_dir;
         bool headers_written = false;
         
-        std::string get_dir_path(const std::string& name);
         void write_header(const std::string& path);
         
     public:
@@ -29,6 +28,7 @@ class TimerLogger {
             std::filesystem::create_directories(log_dir);
         }
 
+        std::string get_dir_path(const std::string& name);
         std::string get_file_path(const std::string& name, bool increment = false);
         int get_current_log(const std::string &directory_path);
         void log_reset(TimerManager::TimerState timer);
