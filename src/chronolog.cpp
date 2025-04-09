@@ -150,10 +150,10 @@ int main(int argc, char** argv) {
 
         // Check if log file exists before trying to read from it
         if(!std::filesystem::exists(logger.get_dir_path(Name)) && (!CreateFlag || !StartFlag)) {
-            std::cerr << "Error: Log file does not exist for '" << Name << "'\nTo create one pass -c / --create flag and --start flag to start the timer";
+            std::cerr << "Error: Log file does not exist for '" << Name \
+                << "'\nTo create one pass -c / --create flag and --start flag to start the timer\n\n";
+            Usage();
             return 1;
-        } else {
-            std::cout << CreateFlag << " " << StartFlag << std::endl;
         }
 
         last_start = logger.get_last_start_time(Name);
@@ -182,6 +182,8 @@ int main(int argc, char** argv) {
                 return 1;
             }
             logger.log_event(timer.start(Name, last_elapsed));
+
+            return 0;
         }
         else if(StopFlag) {
             if(last_event_type != "START") {
@@ -189,10 +191,13 @@ int main(int argc, char** argv) {
                 return 1;
             }
             logger.log_event(timer.stop(Name, last_start, last_elapsed));
+
+            return 0;
         }
         else if(ResetFlag) {
             logger.log_reset(timer.reset(Name));
 
+            return 0;
         } else if(!Add.empty()) {
             double add_double = 0.0;
             if(!SecondsFlag) {
@@ -210,6 +215,8 @@ int main(int argc, char** argv) {
                 }
             }
             logger.log_event(timer.add(Name, last_elapsed, add_double));
+
+            return 0;
         } else {
             // Handle no timer operations to just print
             double elapsed = 0.0;
@@ -234,9 +241,9 @@ int main(int argc, char** argv) {
             } else {
                 std::cout << "Total elapsed time for " << Name << ": " << elapsed_string << std::endl;
             }
+
+            return 0;
         }
-        
-        return 0;
     }
 
     // Act on flags
@@ -249,7 +256,8 @@ int main(int argc, char** argv) {
         return EXIT_SUCCESS;
     }
 
-    return 0;
+    Usage();
+    return 1;
 }
 
 // Copyright (c) 2024, Maxamilian Kidd-May
